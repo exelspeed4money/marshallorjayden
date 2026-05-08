@@ -7,7 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
-*{ -webkit-tap-highlight-color: transparent; }
+*{
+  -webkit-tap-highlight-color: transparent;
+}
 
 body{
   margin:0;
@@ -75,8 +77,13 @@ body{
   transform:scale(0.95);
 }
 
-.marshall{ background:#ff7a3d; }
-.jayden{ background:#36c26e; }
+.marshall{
+  background:#ff7a3d;
+}
+
+.jayden{
+  background:#36c26e;
+}
 
 .result{
   margin-top:25px;
@@ -99,7 +106,6 @@ body{
   font-weight:600;
 }
 
-/* efek +1 */
 .plus{
   position:absolute;
   top:10px;
@@ -111,12 +117,21 @@ body{
 }
 
 @keyframes pop{
-  0%{opacity:0; transform:translateY(10px);}
-  50%{opacity:1;}
-  100%{opacity:0; transform:translateY(-20px);}
+  0%{
+    opacity:0;
+    transform:translateY(10px);
+  }
+
+  50%{
+    opacity:1;
+  }
+
+  100%{
+    opacity:0;
+    transform:translateY(-20px);
+  }
 }
 
-/* credit */
 .credit{
   margin-top:15px;
   font-size:14px;
@@ -129,7 +144,6 @@ body{
   font-weight:600;
 }
 
-/* emoji */
 .emoji{
   position:fixed;
   font-size:42px;
@@ -137,8 +151,14 @@ body{
 }
 
 @keyframes float{
-  0%{transform:translateY(100vh);}
-  100%{transform:translateY(-10vh);opacity:0;}
+  0%{
+    transform:translateY(100vh);
+  }
+
+  100%{
+    transform:translateY(-10vh);
+    opacity:0;
+  }
 }
 </style>
 </head>
@@ -146,18 +166,31 @@ body{
 <body>
 
 <div class="container">
-  <div class="title">🔥 PILIH CUII 🔥</div>
+
+  <div class="title">
+    🔥 PILIH CUII 🔥
+  </div>
 
   <div class="vote-wrap">
-    <div class="btn marshall" onclick="vote('marshall', this)">
+
+    <div class="btn marshall"
+    onclick="vote('marshall', this)">
+
       <img src="marshall.jpg">
+
       <span>MARSHALL</span>
+
     </div>
 
-    <div class="btn jayden" onclick="vote('jayden', this)">
+    <div class="btn jayden"
+    onclick="vote('jayden', this)">
+
       <img src="jayden.jpg">
+
       <span>JAYDEN</span>
+
     </div>
+
   </div>
 
   <div class="result" id="resultText"></div>
@@ -167,99 +200,290 @@ body{
   </div>
 
   <div class="credit">
-    buatan <a href="https://wa.me/6282189289988" target="_blank">Exel butuh duit</a>
+    buatan
+    <a href="https://wa.me/6282189289988"
+    target="_blank">
+      Exel butuh duit
+    </a>
   </div>
+
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, doc, getDoc, updateDoc, increment }
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  updateDoc,
+  increment,
+  setDoc
+}
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCQonEKVzZlxt_iZAQdtDNj0mHYDxKjfXo",
-  authDomain: "jaydenormarshall.firebaseapp.com",
-  projectId: "jaydenormarshall",
+
+  apiKey:
+  "AIzaSyCQonEKVzZlxt_iZAQdtDNj0mHYDxKjfXo",
+
+  authDomain:
+  "jaydenormarshall.firebaseapp.com",
+
+  projectId:
+  "jaydenormarshall",
+
 };
 
 const app = initializeApp(firebaseConfig);
+
 const db = getFirestore(app);
 
-const voteRef = doc(db,"votes","marshallvsjayden");
+/* document vote */
+const voteRef =
+doc(db,"votes","marshallvsjayden");
 
-let voted = localStorage.getItem("voted_marshallvsjayden");
+/* bikin id device */
 
-function disableButtons(){
-  document.querySelectorAll(".btn").forEach(b=>{
-    b.style.opacity="0.5";
-    b.style.pointerEvents="none";
-  });
+let deviceId =
+localStorage.getItem("deviceId");
+
+if(!deviceId){
+
+  deviceId =
+    navigator.userAgent +
+    screen.width +
+    screen.height +
+    navigator.language;
+
+  deviceId = btoa(deviceId);
+
+  localStorage.setItem(
+    "deviceId",
+    deviceId
+  );
+
 }
-if(voted) disableButtons();
 
-const emojis = ["🔥","💥","🎉","😍","⚡"];
-setInterval(()=>{
-  const e = document.createElement("div");
-  e.className="emoji";
-  e.innerText = emojis[Math.floor(Math.random()*emojis.length)];
-  e.style.left = Math.random()*100+"%";
-  document.body.appendChild(e);
-  setTimeout(()=>e.remove(),4000);
-},700);
+/* collection voters */
 
-window.vote = async function(name, el){
-  if(voted){
-    alert("Udah vote, jangan rakus");
-    return;
+const voterRef =
+doc(db,"voters",deviceId);
+
+let voted = false;
+
+/* cek vote */
+
+async function checkVote(){
+
+  const snap =
+  await getDoc(voterRef);
+
+  if(snap.exists()){
+
+    voted = true;
+
+    disableButtons();
+
   }
 
-  const plus = document.createElement("div");
-  plus.className="plus";
-  plus.innerText="+1";
-  el.appendChild(plus);
-  setTimeout(()=>plus.remove(),800);
+}
 
-  await updateDoc(voteRef,{
-    [name]: increment(1)
+/* disable tombol */
+
+function disableButtons(){
+
+  document
+  .querySelectorAll(".btn")
+  .forEach(btn=>{
+
+    btn.style.opacity="0.5";
+
+    btn.style.pointerEvents="none";
+
   });
 
-  localStorage.setItem("voted_marshallvsjayden","yes");
+}
+
+/* emoji */
+
+const emojis =
+["🔥","💥","🎉","😍","⚡"];
+
+setInterval(()=>{
+
+  const e =
+  document.createElement("div");
+
+  e.className="emoji";
+
+  e.innerText =
+  emojis[
+    Math.floor(
+      Math.random()*emojis.length
+    )
+  ];
+
+  e.style.left =
+  Math.random()*100 + "%";
+
+  document.body.appendChild(e);
+
+  setTimeout(()=>{
+
+    e.remove();
+
+  },4000);
+
+},700);
+
+/* vote */
+
+window.vote =
+async function(name,el){
+
+  if(voted){
+
+    alert(
+      "Udah vote, jangan rakus"
+    );
+
+    return;
+
+  }
+
   voted = true;
 
   disableButtons();
+
+  /* efek +1 */
+
+  const plus =
+  document.createElement("div");
+
+  plus.className="plus";
+
+  plus.innerText="+1";
+
+  el.appendChild(plus);
+
+  setTimeout(()=>{
+
+    plus.remove();
+
+  },800);
+
+  /* tambah vote */
+
+  await updateDoc(voteRef,{
+
+    [name]: increment(1)
+
+  });
+
+  /* tandain udah vote */
+
+  await setDoc(voterRef,{
+
+    voted:true,
+
+    pilih:name,
+
+    waktu:Date.now()
+
+  });
+
   load(true);
+
 }
+
+/* load */
 
 async function load(show=false){
-  const snap = await getDoc(voteRef);
-  const data = snap.data() || {marshall:0,jayden:0};
 
-  if(show || localStorage.getItem("voted_marshallvsjayden")){
-    resultText.style.display="block";
+  const snap =
+  await getDoc(voteRef);
+
+  const data =
+  snap.data() || {
+
+    marshall:0,
+    jayden:0
+
+  };
+
+  if(show || voted){
+
+    resultText.style.display=
+    "block";
+
   }
 
-  if(!show && !localStorage.getItem("voted_marshallvsjayden")){
-    resultText.innerText = "Marshall: ? | Jayden: ?";
-  }else{
+  if(!show && !voted){
+
     resultText.innerText =
-      "Marshall: "+data.marshall+" | Jayden: "+data.jayden;
+    "Marshall: ? | Jayden: ?";
+
+  }else{
+
+    resultText.innerText =
+
+    "Marshall: " +
+    data.marshall +
+
+    " | Jayden: " +
+
+    data.jayden;
+
   }
 
-  const now = new Date();
-  const end = new Date("2026-05-10T12:00:00");
+  const now =
+  new Date();
+
+  const end =
+  new Date(
+    "2026-05-10T12:00:00"
+  );
 
   if(now > end){
-    if(data.marshall > data.jayden){
-      winnerText.innerText="🏆 MARSHALL MENANG";
-    }else if(data.jayden > data.marshall){
-      winnerText.innerText="🏆 JAYDEN MENANG";
-    }else{
-      winnerText.innerText="🤝 SERI";
+
+    if(
+      data.marshall >
+      data.jayden
+    ){
+
+      winnerText.innerText =
+      "🏆 MARSHALL MENANG";
+
     }
+
+    else if(
+      data.jayden >
+      data.marshall
+    ){
+
+      winnerText.innerText =
+      "🏆 JAYDEN MENANG";
+
+    }
+
+    else{
+
+      winnerText.innerText =
+      "🤝 SERI";
+
+    }
+
   }
+
 }
 
+await checkVote();
+
 load();
+
 </script>
 
 </body>
