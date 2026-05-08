@@ -7,7 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
-*{ -webkit-tap-highlight-color: transparent; }
+*{
+  -webkit-tap-highlight-color: transparent;
+}
 
 body{
   margin:0;
@@ -54,6 +56,7 @@ body{
   align-items:center;
   justify-content:center;
   position:relative;
+  transition:0.1s;
 }
 
 .btn img{
@@ -75,8 +78,13 @@ body{
   transform:scale(0.95);
 }
 
-.marshall{ background:#ff7a3d; }
-.jayden{ background:#36c26e; }
+.marshall{
+  background:#ff7a3d;
+}
+
+.jayden{
+  background:#36c26e;
+}
 
 .result{
   margin-top:25px;
@@ -95,11 +103,19 @@ body{
   display:flex;
   align-items:center;
   justify-content:center;
+  flex-direction:column;
   font-size:20px;
   font-weight:600;
+  padding:10px;
+  text-align:center;
 }
 
-/* efek +1 */
+.gold{
+  color:#f5b301;
+  text-shadow:1px 1px 0 #000;
+  font-size:24px;
+}
+
 .plus{
   position:absolute;
   top:10px;
@@ -111,12 +127,19 @@ body{
 }
 
 @keyframes pop{
-  0%{opacity:0; transform:translateY(10px);}
-  50%{opacity:1;}
-  100%{opacity:0; transform:translateY(-20px);}
+  0%{
+    opacity:0;
+    transform:translateY(10px);
+  }
+  50%{
+    opacity:1;
+  }
+  100%{
+    opacity:0;
+    transform:translateY(-20px);
+  }
 }
 
-/* credit */
 .credit{
   margin-top:15px;
   font-size:14px;
@@ -129,7 +152,6 @@ body{
   font-weight:600;
 }
 
-/* emoji */
 .emoji{
   position:fixed;
   font-size:42px;
@@ -137,8 +159,13 @@ body{
 }
 
 @keyframes float{
-  0%{transform:translateY(100vh);}
-  100%{transform:translateY(-10vh);opacity:0;}
+  0%{
+    transform:translateY(100vh);
+  }
+  100%{
+    transform:translateY(-10vh);
+    opacity:0;
+  }
 }
 </style>
 </head>
@@ -146,9 +173,11 @@ body{
 <body>
 
 <div class="container">
+
   <div class="title">🔥 PILIH CUII 🔥</div>
 
   <div class="vote-wrap">
+
     <div class="btn marshall" onclick="vote('marshall', this)">
       <img src="marshall.jpg">
       <span>MARSHALL</span>
@@ -158,22 +187,35 @@ body{
       <img src="jayden.jpg">
       <span>JAYDEN</span>
     </div>
+
   </div>
 
   <div class="result" id="resultText"></div>
 
   <div class="winner-box" id="winnerText">
-    ⏳ Diumumin 10 Mei 2026
+    ⏳ Hasil Vote Diumumin 10 Mei 2026 Jam 12 Siang
   </div>
 
   <div class="credit">
-    buatan <a href="https://wa.me/6282189289988" target="_blank">Exel butuh duit</a>
+    buatan 
+    <a href="https://wa.me/6282189289988" target="_blank">
+      Exel butuh duit
+    </a>
   </div>
+
 </div>
 
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, doc, getDoc, updateDoc, increment, setDoc }
+
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  updateDoc,
+  increment
+}
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -183,51 +225,39 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+
 const db = getFirestore(app);
 
 const voteRef = doc(db,"votes","marshallvsjayden");
 
-/* anti browser ganti dikit */
-let deviceId = localStorage.getItem("deviceId");
-
-if(!deviceId){
-  deviceId = btoa(
-    navigator.userAgent +
-    screen.width +
-    screen.height +
-    navigator.language
-  );
-
-  localStorage.setItem("deviceId", deviceId);
-}
-
-const voterRef = doc(db,"voters",deviceId);
-
-let voted = false;
-
-async function checkVote(){
-  const snap = await getDoc(voterRef);
-
-  if(snap.exists()){
-    voted = true;
-    disableButtons();
-  }
-}
+let voted = localStorage.getItem("voted_marshallvsjayden");
 
 function disableButtons(){
+
   document.querySelectorAll(".btn").forEach(b=>{
+
     b.style.opacity="0.5";
     b.style.pointerEvents="none";
+
   });
+
 }
-checkVote();
+
+if(voted){
+  disableButtons();
+}
 
 const emojis = ["🔥","💥","🎉","😍","⚡"];
 
 setInterval(()=>{
+
   const e = document.createElement("div");
+
   e.className="emoji";
-  e.innerText = emojis[Math.floor(Math.random()*emojis.length)];
+
+  e.innerText =
+    emojis[Math.floor(Math.random()*emojis.length)];
+
   e.style.left = Math.random()*100+"%";
 
   document.body.appendChild(e);
@@ -239,16 +269,25 @@ setInterval(()=>{
 window.vote = async function(name, el){
 
   if(voted){
+
     alert("Udah vote, jangan rakus");
     return;
+
   }
 
   voted = true;
 
   disableButtons();
 
+  localStorage.setItem(
+    "voted_marshallvsjayden",
+    "yes"
+  );
+
   const plus = document.createElement("div");
+
   plus.className="plus";
+
   plus.innerText="+1";
 
   el.appendChild(plus);
@@ -259,17 +298,9 @@ window.vote = async function(name, el){
     [name]: increment(1)
   });
 
-  await setDoc(voterRef,{
-    voted:true,
-    pilih:name
-  });
-
-  localStorage.setItem("voted","yes");
-
-  load(true);
 }
 
-async function load(show=false){
+async function load(){
 
   const snap = await getDoc(voteRef);
 
@@ -278,45 +309,41 @@ async function load(show=false){
     jayden:0
   };
 
-  if(show || voted){
-    resultText.style.display="block";
-  }
+  const now = new Date();
 
-  if(!show && !voted){
+  const end = new Date("2026-05-10T12:00:00");
 
-    resultText.innerText =
-    "Marshall: ? | Jayden: ?";
+  if(now < end){
+
+    winnerText.innerHTML = `
+      ⏳ Hasil Vote Diumumin 10 Mei 2026 Jam 12 Siang
+    `;
 
   }else{
 
-    resultText.innerText =
-    "Marshall: "+data.marshall+
-    " | Jayden: "+data.jayden;
-
-  }
-
-  const now = new Date();
-
-  const end =
-  new Date("2026-05-10T12:00:00");
-
-  if(now > end){
-
     if(data.marshall > data.jayden){
 
-      winnerText.innerText =
-      "🏆 MARSHALL MENANG";
+      winnerText.innerHTML = `
+        <div>Marshall: ${data.marshall}</div>
+        <div>Jayden: ${data.jayden}</div>
+        <div class="gold">🏆 MARSHALL MENANG</div>
+      `;
 
     }else if(data.jayden > data.marshall){
 
-      winnerText.innerText =
-      "🏆 JAYDEN MENANG";
+      winnerText.innerHTML = `
+        <div>Marshall: ${data.marshall}</div>
+        <div>Jayden: ${data.jayden}</div>
+        <div class="gold">🏆 JAYDEN MENANG</div>
+      `;
 
     }else{
 
-      winnerText.innerText =
-      "🤝 SERI";
-
+      winnerText.innerHTML = `
+        <div>Marshall: ${data.marshall}</div>
+        <div>Jayden: ${data.jayden}</div>
+        <div class="gold">🤝 SERI</div>
+      `;
     }
 
   }
@@ -324,6 +351,7 @@ async function load(show=false){
 }
 
 load();
+
 </script>
 
 </body>
