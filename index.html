@@ -7,9 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
-*{
-  -webkit-tap-highlight-color: transparent;
-}
+*{ -webkit-tap-highlight-color: transparent; }
 
 body{
   margin:0;
@@ -77,13 +75,8 @@ body{
   transform:scale(0.95);
 }
 
-.marshall{
-  background:#ff7a3d;
-}
-
-.jayden{
-  background:#36c26e;
-}
+.marshall{ background:#ff7a3d; }
+.jayden{ background:#36c26e; }
 
 .result{
   margin-top:25px;
@@ -106,6 +99,7 @@ body{
   font-weight:600;
 }
 
+/* efek +1 */
 .plus{
   position:absolute;
   top:10px;
@@ -117,21 +111,12 @@ body{
 }
 
 @keyframes pop{
-  0%{
-    opacity:0;
-    transform:translateY(10px);
-  }
-
-  50%{
-    opacity:1;
-  }
-
-  100%{
-    opacity:0;
-    transform:translateY(-20px);
-  }
+  0%{opacity:0; transform:translateY(10px);}
+  50%{opacity:1;}
+  100%{opacity:0; transform:translateY(-20px);}
 }
 
+/* credit */
 .credit{
   margin-top:15px;
   font-size:14px;
@@ -144,6 +129,7 @@ body{
   font-weight:600;
 }
 
+/* emoji */
 .emoji{
   position:fixed;
   font-size:42px;
@@ -151,14 +137,8 @@ body{
 }
 
 @keyframes float{
-  0%{
-    transform:translateY(100vh);
-  }
-
-  100%{
-    transform:translateY(-10vh);
-    opacity:0;
-  }
+  0%{transform:translateY(100vh);}
+  100%{transform:translateY(-10vh);opacity:0;}
 }
 </style>
 </head>
@@ -166,31 +146,18 @@ body{
 <body>
 
 <div class="container">
-
-  <div class="title">
-    🔥 PILIH CUII 🔥
-  </div>
+  <div class="title">🔥 PILIH CUII 🔥</div>
 
   <div class="vote-wrap">
-
-    <div class="btn marshall"
-    onclick="vote('marshall', this)">
-
+    <div class="btn marshall" onclick="vote('marshall', this)">
       <img src="marshall.jpg">
-
       <span>MARSHALL</span>
-
     </div>
 
-    <div class="btn jayden"
-    onclick="vote('jayden', this)">
-
+    <div class="btn jayden" onclick="vote('jayden', this)">
       <img src="jayden.jpg">
-
       <span>JAYDEN</span>
-
     </div>
-
   </div>
 
   <div class="result" id="resultText"></div>
@@ -200,225 +167,119 @@ body{
   </div>
 
   <div class="credit">
-    buatan
-    <a href="https://wa.me/6282189289988"
-    target="_blank">
-      Exel butuh duit
-    </a>
+    buatan <a href="https://wa.me/6282189289988" target="_blank">Exel butuh duit</a>
   </div>
-
 </div>
 
 <script type="module">
-
-import { initializeApp }
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  updateDoc,
-  increment,
-  setDoc
-}
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc, updateDoc, increment, setDoc }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-
-  apiKey:
-  "AIzaSyCQonEKVzZlxt_iZAQdtDNj0mHYDxKjfXo",
-
-  authDomain:
-  "jaydenormarshall.firebaseapp.com",
-
-  projectId:
-  "jaydenormarshall",
-
+  apiKey: "AIzaSyCQonEKVzZlxt_iZAQdtDNj0mHYDxKjfXo",
+  authDomain: "jaydenormarshall.firebaseapp.com",
+  projectId: "jaydenormarshall",
 };
 
 const app = initializeApp(firebaseConfig);
-
 const db = getFirestore(app);
 
-/* document vote */
-const voteRef =
-doc(db,"votes","marshallvsjayden");
+const voteRef = doc(db,"votes","marshallvsjayden");
 
-/* bikin id device */
-
-let deviceId =
-localStorage.getItem("deviceId");
+/* anti browser ganti dikit */
+let deviceId = localStorage.getItem("deviceId");
 
 if(!deviceId){
-
-  deviceId =
+  deviceId = btoa(
     navigator.userAgent +
     screen.width +
     screen.height +
-    navigator.language;
-
-  deviceId = btoa(deviceId);
-
-  localStorage.setItem(
-    "deviceId",
-    deviceId
+    navigator.language
   );
 
+  localStorage.setItem("deviceId", deviceId);
 }
 
-/* collection voters */
-
-const voterRef =
-doc(db,"voters",deviceId);
+const voterRef = doc(db,"voters",deviceId);
 
 let voted = false;
 
-/* cek vote */
-
 async function checkVote(){
-
-  const snap =
-  await getDoc(voterRef);
+  const snap = await getDoc(voterRef);
 
   if(snap.exists()){
-
     voted = true;
-
     disableButtons();
-
   }
-
 }
-
-/* disable tombol */
 
 function disableButtons(){
-
-  document
-  .querySelectorAll(".btn")
-  .forEach(btn=>{
-
-    btn.style.opacity="0.5";
-
-    btn.style.pointerEvents="none";
-
+  document.querySelectorAll(".btn").forEach(b=>{
+    b.style.opacity="0.5";
+    b.style.pointerEvents="none";
   });
-
 }
+checkVote();
 
-/* emoji */
-
-const emojis =
-["🔥","💥","🎉","😍","⚡"];
+const emojis = ["🔥","💥","🎉","😍","⚡"];
 
 setInterval(()=>{
-
-  const e =
-  document.createElement("div");
-
+  const e = document.createElement("div");
   e.className="emoji";
-
-  e.innerText =
-  emojis[
-    Math.floor(
-      Math.random()*emojis.length
-    )
-  ];
-
-  e.style.left =
-  Math.random()*100 + "%";
+  e.innerText = emojis[Math.floor(Math.random()*emojis.length)];
+  e.style.left = Math.random()*100+"%";
 
   document.body.appendChild(e);
 
-  setTimeout(()=>{
-
-    e.remove();
-
-  },4000);
+  setTimeout(()=>e.remove(),4000);
 
 },700);
 
-/* vote */
-
-window.vote =
-async function(name,el){
+window.vote = async function(name, el){
 
   if(voted){
-
-    alert(
-      "Udah vote, jangan rakus"
-    );
-
+    alert("Udah vote, jangan rakus");
     return;
-
   }
 
   voted = true;
 
   disableButtons();
 
-  /* efek +1 */
-
-  const plus =
-  document.createElement("div");
-
+  const plus = document.createElement("div");
   plus.className="plus";
-
   plus.innerText="+1";
 
   el.appendChild(plus);
 
-  setTimeout(()=>{
-
-    plus.remove();
-
-  },800);
-
-  /* tambah vote */
+  setTimeout(()=>plus.remove(),800);
 
   await updateDoc(voteRef,{
-
     [name]: increment(1)
-
   });
-
-  /* tandain udah vote */
 
   await setDoc(voterRef,{
-
     voted:true,
-
-    pilih:name,
-
-    waktu:Date.now()
-
+    pilih:name
   });
 
+  localStorage.setItem("voted","yes");
+
   load(true);
-
 }
-
-/* load */
 
 async function load(show=false){
 
-  const snap =
-  await getDoc(voteRef);
+  const snap = await getDoc(voteRef);
 
-  const data =
-  snap.data() || {
-
+  const data = snap.data() || {
     marshall:0,
     jayden:0
-
   };
 
   if(show || voted){
-
-    resultText.style.display=
-    "block";
-
+    resultText.style.display="block";
   }
 
   if(!show && !voted){
@@ -429,47 +290,29 @@ async function load(show=false){
   }else{
 
     resultText.innerText =
-
-    "Marshall: " +
-    data.marshall +
-
-    " | Jayden: " +
-
-    data.jayden;
+    "Marshall: "+data.marshall+
+    " | Jayden: "+data.jayden;
 
   }
 
-  const now =
-  new Date();
+  const now = new Date();
 
   const end =
-  new Date(
-    "2026-05-10T12:00:00"
-  );
+  new Date("2026-05-10T12:00:00");
 
   if(now > end){
 
-    if(
-      data.marshall >
-      data.jayden
-    ){
+    if(data.marshall > data.jayden){
 
       winnerText.innerText =
       "🏆 MARSHALL MENANG";
 
-    }
-
-    else if(
-      data.jayden >
-      data.marshall
-    ){
+    }else if(data.jayden > data.marshall){
 
       winnerText.innerText =
       "🏆 JAYDEN MENANG";
 
-    }
-
-    else{
+    }else{
 
       winnerText.innerText =
       "🤝 SERI";
@@ -480,10 +323,7 @@ async function load(show=false){
 
 }
 
-await checkVote();
-
 load();
-
 </script>
 
 </body>
