@@ -90,7 +90,6 @@ body{
   margin-top:25px;
   font-size:19px;
   font-weight:600;
-  display:none;
 }
 
 .winner-box{
@@ -103,17 +102,10 @@ body{
   display:flex;
   align-items:center;
   justify-content:center;
-  flex-direction:column;
   font-size:20px;
   font-weight:600;
-  padding:10px;
   text-align:center;
-}
-
-.gold{
-  color:#f5b301;
-  text-shadow:1px 1px 0 #000;
-  font-size:24px;
+  padding:10px;
 }
 
 .plus{
@@ -190,14 +182,16 @@ body{
 
   </div>
 
-  <div class="result" id="resultText"></div>
+  <div class="result" id="resultText">
+    ⏳ Hasil Vote Diumumin 12 Mei 2026
+  </div>
 
   <div class="winner-box" id="winnerText">
-    ⏳ Hasil Vote Diumumin 10 Mei 2026 Jam 12 Siang
+    ⏳ Pemenang Diumumin 12 Mei 2026
   </div>
 
   <div class="credit">
-    buatan 
+    buatan
     <a href="https://wa.me/6282189289988" target="_blank">
       Exel butuh duit
     </a>
@@ -207,7 +201,8 @@ body{
 
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 
 import {
   getFirestore,
@@ -228,13 +223,19 @@ const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
 
-const voteRef = doc(db,"votes","marshallvsjayden");
+const voteRef = doc(
+  db,
+  "votes",
+  "marshallvsjayden"
+);
 
-let voted = localStorage.getItem("voted_marshallvsjayden");
+let voted =
+localStorage.getItem("voted_marshallvsjayden");
 
 function disableButtons(){
 
-  document.querySelectorAll(".btn").forEach(b=>{
+  document.querySelectorAll(".btn")
+  .forEach(b=>{
 
     b.style.opacity="0.5";
     b.style.pointerEvents="none";
@@ -256,7 +257,7 @@ setInterval(()=>{
   e.className="emoji";
 
   e.innerText =
-    emojis[Math.floor(Math.random()*emojis.length)];
+  emojis[Math.floor(Math.random()*emojis.length)];
 
   e.style.left = Math.random()*100+"%";
 
@@ -284,7 +285,8 @@ window.vote = async function(name, el){
     "yes"
   );
 
-  const plus = document.createElement("div");
+  const plus =
+  document.createElement("div");
 
   plus.className="plus";
 
@@ -311,38 +313,64 @@ async function load(){
 
   const now = new Date();
 
-  const end = new Date("2026-05-10T12:00:00");
+  const end =
+  new Date("2026-05-12T12:00:00");
 
   if(now < end){
 
-    winnerText.innerHTML = `
-      ⏳ Hasil Vote Diumumin 12 Mei`;
+    resultText.innerHTML =
+    "⏳ Hasil Vote Diumumin 12 Mei 2026";
+
+    winnerText.innerHTML =
+    "⏳ Pemenang Diumumin 12 Mei 2026";
 
   }else{
 
     if(data.marshall > data.jayden){
 
-      winnerText.innerHTML = `
-        <div>Marshall: ${data.marshall}</div>
-        <div>Jayden: ${data.jayden}</div>
-        <div class="gold">🏆 MARSHALL MENANG</div>
+      resultText.innerHTML = `
+        <span style="color:#f5b301">
+          Marshall: ${data.marshall}
+        </span>
+        |
+        Jayden: ${data.jayden}
       `;
 
-    }else if(data.jayden > data.marshall){
+      winnerText.innerHTML =
+      "🏆 MARSHALL MENANG";
 
-      winnerText.innerHTML = `
-        <div>Marshall: ${data.marshall}</div>
-        <div>Jayden: ${data.jayden}</div>
-        <div class="gold">🏆 JAYDEN MENANG</div>
+    }
+
+    else if(data.jayden > data.marshall){
+
+      resultText.innerHTML = `
+        Marshall: ${data.marshall}
+        |
+        <span style="color:#f5b301">
+          Jayden: ${data.jayden}
+        </span>
       `;
 
-    }else{
+      winnerText.innerHTML =
+      "🏆 JAYDEN MENANG";
 
-      winnerText.innerHTML = `
-        <div>Marshall: ${data.marshall}</div>
-        <div>Jayden: ${data.jayden}</div>
-        <div class="gold">🤝 SERI</div>
+    }
+
+    else{
+
+      resultText.innerHTML = `
+        <span style="color:#f5b301">
+          Marshall: ${data.marshall}
+        </span>
+        |
+        <span style="color:#f5b301">
+          Jayden: ${data.jayden}
+        </span>
       `;
+
+      winnerText.innerHTML =
+      "🤝 SERI";
+
     }
 
   }
